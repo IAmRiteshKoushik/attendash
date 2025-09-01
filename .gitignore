@@ -1,1 +1,5 @@
+# Ignoring configuration file
 .attendash.yaml
+
+# Ignoring binary
+attendash
