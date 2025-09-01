@@ -12,7 +12,7 @@ import (
 
 var (
 	cfgFile     string
-	userLicense = ".attendash.yaml"
+	userLicense = ".attendash.yaml" // Hardcoded for now, to be changed later
 
 	rootCmd = &cobra.Command{
 		Use:   "attendash",
@@ -32,10 +32,6 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig, loadLicense)
-
-	// rootCmd.PersistentFlags().StringVar(
-	// 	&cfgFile, "config", "", "config file (default is $HOME/.attendash.yaml)")
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func initConfig() {
