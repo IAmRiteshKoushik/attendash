@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	cfgFile     string
-	userLicense = ".attendash.yaml" // Hardcoded for now, to be changed later
+	cfgFile     = ".attendash.yaml" // Hardcoded for now, to be changed later
+	userLicense string
 
 	rootCmd = &cobra.Command{
 		Use:   "attendash",
@@ -48,9 +48,7 @@ func initConfig() {
 		viper.SetConfigName(".attendash")
 	}
 
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	} else {
+	if err := viper.ReadInConfig(); err != nil {
 		fmt.Println("No config file found or error reading config:", err)
 	}
 }
