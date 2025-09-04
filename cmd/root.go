@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/IAmRiteshKoushik/attendash/ui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -20,6 +21,9 @@ var (
 		Long: `Attendash is a terminal-based admin dashboard for managing attendance 
 tracker data. It provides a streamlined TUI to view, edit, and analyze attendance 
 records for ACM events.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return ui.DashboardInit()
+		},
 	}
 )
 
