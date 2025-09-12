@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/appwrite/sdk-for-go/appwrite"
-	"github.com/appwrite/sdk-for-go/id"
+	// 	"github.com/appwrite/sdk-for-go/appwrite"
+	// "github.com/appwrite/sdk-for-go/id"
 	"github.com/appwrite/sdk-for-go/models"
 	"github.com/appwrite/sdk-for-go/tablesdb"
 	"github.com/spf13/cobra"
@@ -83,98 +83,98 @@ func schemaFunc(cmd *cobra.Command, args []string) error {
 }
 
 func initDatabase() {
-	Orm = appwrite.NewTablesDB(appwriteClient)
+	// 	Orm = appwrite.NewTablesDB(appwriteClient)
 
-	Db, err := Orm.Create(
-		id.Unique(),
-		dbName,
-		Orm.WithCreateEnabled(true))
-	if err != nil {
-		// err
-		panic("Error occured")
-	}
+	// 	Db, err := Orm.Create(
+	// 		id.Unique(),
+	// 		dbName,
+	// 		Orm.WithCreateEnabled(true))
+	// 	if err != nil {
+	// 		// err
+	// 		panic("Error occured")
+	// 	}
 
-	MembersTable, err = Orm.CreateTable(
-		Db.Id,
-		id.Unique(),
-		membersTable,
-	)
-	if err != nil {
-		// TODO: Log the error
-		panic("error occured")
-	}
+	// 	MembersTable, err = Orm.CreateTable(
+	// 		Db.Id,
+	// 		id.Unique(),
+	// 		membersTable,
+	// 	)
+	// 	if err != nil {
+	// 		// TODO: Log the error
+	// 		panic("error occured")
+	// 	}
 
-	EventsTable, err = Orm.CreateTable(
-		Db.Id,
-		id.Unique(),
-		eventsTable,
-	)
-	if err != nil {
-		// TODO: Log the error
-		panic("error occured")
-	}
+	// 	EventsTable, err = Orm.CreateTable(
+	// 		Db.Id,
+	// 		id.Unique(),
+	// 		eventsTable,
+	// 	)
+	// 	if err != nil {
+	// 		// TODO: Log the error
+	// 		panic("error occured")
+	// 	}
 
-	ContestsTable, err = Orm.CreateTable(
-		Db.Id,
-		id.Unique(),
-		contestsTable,
-	)
-	if err != nil {
-		// TODO: Log the error
-		panic("error occured")
-	}
+	// 	ContestsTable, err = Orm.CreateTable(
+	// 		Db.Id,
+	// 		id.Unique(),
+	// 		contestsTable,
+	// 	)
+	// 	if err != nil {
+	// 		// TODO: Log the error
+	// 		panic("error occured")
+	// 	}
 
-	RegularAttendanceTable, err = Orm.CreateTable(
-		Db.Id,
-		id.Unique(),
-		regularAttendanceTable,
-	)
-	if err != nil {
-		// TODO: Log the error
-		panic("error occured")
-	}
+	// 	RegularAttendanceTable, err = Orm.CreateTable(
+	// 		Db.Id,
+	// 		id.Unique(),
+	// 		regularAttendanceTable,
+	// 	)
+	// 	if err != nil {
+	// 		// TODO: Log the error
+	// 		panic("error occured")
+	// 	}
 
-	MembersTable, err = Orm.CreateTable(
-		Db.Id,
-		id.Unique(),
-		contestAttendanceTable,
-	)
-	if err != nil {
-		// TODO: Log the error
-		panic("error occured")
-	}
-}
+	// 	MembersTable, err = Orm.CreateTable(
+	// 		Db.Id,
+	// 		id.Unique(),
+	// 		contestAttendanceTable,
+	// 	)
+	// 	if err != nil {
+	// 		// TODO: Log the error
+	// 		panic("error occured")
+	// 	}
+	// }
 
-func setupMembersTable() error {
-	_, err := Orm.CreateEmailColumn(
-		Db.Id,
-		MembersTable.Id,
-		"email",
-		true,
-	)
-	if err != nil {
-		return err
-	}
+	// func setupMembersTable() error {
+	// 	_, err := Orm.CreateEmailColumn(
+	// 		Db.Id,
+	// 		MembersTable.Id,
+	// 		"email",
+	// 		true,
+	// 	)
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-	_, err = Orm.CreateStringColumn(
-		Db.Id,
-		MembersTable.Id,
-		"fullName",
-		255,
-		true,
-	)
-	if err != nil {
-		return err
-	}
+	// 	_, err = Orm.CreateStringColumn(
+	// 		Db.Id,
+	// 		MembersTable.Id,
+	// 		"fullName",
+	// 		255,
+	// 		true,
+	// 	)
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-	_, err = Orm.CreateBooleanColumn(
-		Db.Id,
-		MembersTable.Id,
-		"isPresent",
-		true,
-	)
+	// 	_, err = Orm.CreateBooleanColumn(
+	// 		Db.Id,
+	// 		MembersTable.Id,
+	// 		"isPresent",
+	// 		true,
+	// 	)
 
-	return nil
+	return
 }
 
 func setupEventsTable() error {

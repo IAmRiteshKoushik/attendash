@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	// "github.com/IAmRiteshKoushik/attendash/ui"
+	"github.com/IAmRiteshKoushik/attendash/ui"
 	"github.com/IAmRiteshKoushik/attendash/utils"
 	"github.com/appwrite/sdk-for-go/appwrite"
 	"github.com/appwrite/sdk-for-go/client"
@@ -38,9 +39,9 @@ var rootCmd = &cobra.Command{
 	Long: `Attendash is a terminal-based admin dashboard for managing attendance 
 tracker data. It provides a streamlined TUI to view, edit, and analyze attendance 
 records for ACM events.`,
-	// RunE: func(cmd *cobra.Command, args []string) error {
-	// 	return ui.DashboardInit()
-	// },
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return ui.DashboardInit()
+	},
 }
 
 func Execute() {
@@ -57,9 +58,8 @@ func init() {
 func initConfig() {
 	v := viper.New()
 
-	v.SetConfigName("env")
-	v.SetConfigFile("toml")
-	v.AddConfigPath(".")
+	v.SetConfigFile(cfgFile)
+	v.SetConfigType("toml")
 
 	if err := v.ReadInConfig(); err != nil {
 		panic(utils.ErrorString("Failed to read config from ENVIRONMENT"))
