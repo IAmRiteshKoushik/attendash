@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"fmt"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -46,9 +48,10 @@ func (r *rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	for _, m := range r.modelsMap {
+	for k, m := range r.modelsMap {
 		var cmd tea.Cmd
 		m, cmd = m.Update(msg)
+		r.modelsMap[k] = m
 		cmds = append(cmds, cmd)
 	}
 
@@ -68,15 +71,52 @@ func (r *rootModel) View() string {
 	}
 
 	if r.paneSelected == Preview {
-		leftView = activeStyle.Width(windowSize).Render(leftView)
-	} else {
-		leftView = noStyle.Width(windowSize).Render(leftView)
+		rightView := activeStyle.Width(windowSize).Render(rightView)
+		return lipgloss.JoinHorizontal(lipgloss.Left, leftView, rightView)
 	}
 
 	return lipgloss.JoinHorizontal(lipgloss.Left, leftView, rightView)
 }
+//test data for now
+type simpleModel struct {
+	title string
+}
+
+func NewMainModel() tea.Model {
+	return &simpleModel{title: "Main Pane"}
+}
+
+func NewPreviewModel() tea.Model {
+	return &simpleModel{title: "Preview Pane"}
+}
+
+func (s *simpleModel) Init() tea.Cmd { return nil }
+
+func (s *simpleModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	return s, nil
+}
+
+func (s *simpleModel) View() string {
+	return fmt.Sprintf("\n  %s\n\n  (Press TAB to switch panes, ESC/Ctrl+C to quit)", s.title)
+}
 
 func DashboardInit() error {
-	// modelsMap := make(map[focusIndex]tea.Model)
+	modelsMap := map[focusIndex]tea.Model{
+		Main:    NewMainModel(),
+		Preview: NewPreviewModel(),
+	}
+
+	root := &rootModel{
+		screenWidth:  80,
+		paneSelected: Main,
+		modelsMap:    modelsMap,
+	}
+
+	p := tea.NewProgram(root, tea.WithAltScreen())
+	_, err := p.Run()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
