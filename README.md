@@ -18,3 +18,7 @@ This application is build with the following packages:
 - Bubbles
 - Lipgloss
 - Huh
+
+1. Install the cobra-cli
+2. Compile the code - `go build .`
+3. Run - `./attendash --help` to see the various available commands
