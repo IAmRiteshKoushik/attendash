@@ -9,6 +9,8 @@ import (
 	"github.com/IAmRiteshKoushik/attendash/utils"
 	"github.com/appwrite/sdk-for-go/appwrite"
 	"github.com/appwrite/sdk-for-go/client"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -54,6 +56,15 @@ func init() {
 	cobra.OnInitialize(initConfig, initClient, initDatabase, loadLicense)
 }
 
+func ValidateEnv(cfg *Config) error {
+	return validation.ValidateStruct(cfg,
+		validation.Field(&cfg.EndpointUrl, validation.Required, is.URL),
+		validation.Field(&cfg.ProjectKey, validation.Required),
+		validation.Field(&cfg.ApiKey, validation.Required),
+		validation.Field(&cfg.Mode, validation.Required, validation.In("dev", "prod")),
+	)
+}
+
 func initConfig() {
 	v := viper.New()
 
@@ -66,6 +77,10 @@ func initConfig() {
 	}
 	if err := v.Unmarshal(&cfg); err != nil {
 		panic(utils.ErrorString("Failed to serialize config from ENVIRONMENT"))
+	}
+
+	if err := ValidateEnv(cfg); err != nil {
+		panic(utils.ErrorString("Invalid configuration"))
 	}
 }
 
