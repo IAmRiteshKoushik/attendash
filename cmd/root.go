@@ -1,31 +1,47 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 
-	"github.com/IAmRiteshKoushik/attendash/ui"
+	// "github.com/IAmRiteshKoushik/attendash/ui"
+	"github.com/IAmRiteshKoushik/attendash/utils"
+	"github.com/appwrite/sdk-for-go/appwrite"
+	"github.com/appwrite/sdk-for-go/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
+type Config struct {
+	EndpointUrl string `mapstructure:"ENDPOINT_URL"`
+	ProjectKey  string `mapstructure:"PROJECT_KEY"`
+	ApiKey      string `mapstructure:"API_KEY"`
+	Mode        string `mapstructure:"MODE"`
+}
+
 var (
-	cfgFile     = ".attendash.yaml" // Hardcoded for now, to be changed later
+	cfgFile     = ".env.toml"
 	userLicense string
 
-	rootCmd = &cobra.Command{
-		Use:   "attendash",
-		Short: "Admin dashboard TUI for Attendex (https://github.com/IAmRiteshKoushik/attendex)",
-		Long: `Attendash is a terminal-based admin dashboard for managing attendance 
+	// Load from environment
+	cfg *Config
+
+	// Platform specific stuff
+	appwriteClient client.Client
+)
+
+// rootCmd represents the root command
+var rootCmd = &cobra.Command{
+	Use:   "attendash",
+	Short: "Admin dashboard TUI for Attendex (https://github.com/IAmRiteshKoushik/attendex)",
+	Long: `Attendash is a terminal-based admin dashboard for managing attendance 
 tracker data. It provides a streamlined TUI to view, edit, and analyze attendance 
 records for ACM events.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return ui.DashboardInit()
-		},
-	}
-)
+	// RunE: func(cmd *cobra.Command, args []string) error {
+	// 	return ui.DashboardInit()
+	// },
+}
 
 func Execute() {
 	err := rootCmd.Execute()
@@ -35,25 +51,21 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig, loadLicense)
+	cobra.OnInitialize(initConfig, initClient, initDatabase, loadLicense)
 }
 
 func initConfig() {
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-	} else {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			log.Fatalf("Unable to find home directory: %v", err)
-		}
+	v := viper.New()
 
-		viper.AddConfigPath(home)
-		viper.SetConfigType("yaml")
-		viper.SetConfigName(".attendash")
+	v.SetConfigName("env")
+	v.SetConfigFile("toml")
+	v.AddConfigPath(".")
+
+	if err := v.ReadInConfig(); err != nil {
+		panic(utils.ErrorString("Failed to read config from ENVIRONMENT"))
 	}
-
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Println("No config file found or error reading config:", err)
+	if err := v.Unmarshal(&cfg); err != nil {
+		panic(utils.ErrorString("Failed to serialize config from ENVIRONMENT"))
 	}
 }
 
@@ -78,4 +90,12 @@ func loadLicense() {
 	}
 
 	userLicense = string(content)
+}
+
+func initClient() {
+	appwriteClient = client.New(
+		appwrite.WithProject(cfg.ProjectKey),
+		appwrite.WithKey(cfg.ApiKey),
+		appwrite.WithEndpoint(cfg.EndpointUrl),
+	)
 }

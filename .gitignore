@@ -1,5 +1,5 @@
 # Ignoring configuration file
-.attendash.yaml
+.env.toml
 
 # Ignoring binary
 attendash

@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// licenseCmd represents the license command
 var licenseCmd = &cobra.Command{
 	Use:   "license",
 	Short: "Display the license information for this application",
