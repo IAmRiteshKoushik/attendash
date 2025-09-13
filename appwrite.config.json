@@ -1,0 +1,638 @@
+{
+    "projectId": "68c3492c0021c30081cc",
+    "endpoint": "https://fra.cloud.appwrite.io/v1",
+    "projectName": "attendex",
+    "settings": {
+        "services": {
+            "account": true,
+            "avatars": true,
+            "databases": true,
+            "locale": true,
+            "health": true,
+            "storage": true,
+            "teams": true,
+            "users": true,
+            "sites": true,
+            "functions": true,
+            "graphql": true,
+            "messaging": true
+        },
+        "auth": {
+            "methods": {
+                "jwt": true,
+                "phone": true,
+                "invites": true,
+                "anonymous": true,
+                "email-otp": true,
+                "magic-url": true,
+                "email-password": true
+            },
+            "security": {
+                "duration": 31536000,
+                "limit": 0,
+                "sessionsLimit": 10,
+                "passwordHistory": 0,
+                "passwordDictionary": false,
+                "personalDataCheck": false,
+                "sessionAlerts": false,
+                "mockNumbers": []
+            }
+        }
+    },
+    "functions": [
+        {
+            "$id": "68c5906100366b03cc71",
+            "name": "update-team-size",
+            "runtime": "node-22",
+            "specification": "s-0.5vcpu-512mb",
+            "execute": [],
+            "events": [
+                "databases.attendexDb.tables.teams_participants.rows.*.update"
+            ],
+            "scopes": [
+                "databases.read",
+                "databases.write",
+                "tables.read",
+                "collections.read",
+                "tables.write",
+                "collections.write",
+                "columns.read",
+                "attributes.read",
+                "columns.write",
+                "attributes.write",
+                "indexes.read",
+                "indexes.write",
+                "rows.read",
+                "documents.read",
+                "rows.write",
+                "documents.write"
+            ],
+            "schedule": "",
+            "timeout": 30,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "src/main.js",
+            "commands": "npm install",
+            "path": "functions/update-team-size"
+        },
+        {
+            "$id": "68c59491001581e0ea2c",
+            "name": "upsert-student-details",
+            "runtime": "node-22",
+            "specification": "s-0.5vcpu-512mb",
+            "execute": [],
+            "events": [
+                "databases.attendexDb.tables.solo_participants.rows.*.create",
+                "databases.attendexDb.tables.team_participants.rows.*.create"
+            ],
+            "scopes": [
+                "databases.read",
+                "databases.write",
+                "tables.read",
+                "collections.read",
+                "tables.write",
+                "collections.write",
+                "columns.read",
+                "attributes.read",
+                "columns.write",
+                "attributes.write",
+                "indexes.read",
+                "indexes.write",
+                "rows.read",
+                "documents.read",
+                "rows.write",
+                "documents.write"
+            ],
+            "schedule": "",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "src/main.js",
+            "commands": "npm install",
+            "path": "functions/upsert-student-details"
+        }
+    ],
+    "tablesDB": [
+        {
+            "$id": "attendexDb",
+            "name": "attendexDb",
+            "enabled": true
+        }
+    ],
+    "tables": [
+        {
+            "$id": "63ea467139890ca7b60e",
+            "$permissions": [],
+            "databaseId": "attendexDb",
+            "name": "students",
+            "enabled": true,
+            "columns": [
+                {
+                    "key": "email",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "format": "email",
+                    "default": null
+                },
+                {
+                    "key": "fullName",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "isPresent",
+                    "type": "boolean",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "63ea4671b6bb5d28fdd3",
+            "$permissions": [],
+            "databaseId": "attendexDb",
+            "name": "events",
+            "enabled": true,
+            "columns": [
+                {
+                    "key": "eventName",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "isOffline",
+                    "type": "boolean",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "eventLocation",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "dateAndTime",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "label",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "elements": [
+                        "solo",
+                        "team"
+                    ],
+                    "format": "enum",
+                    "default": null
+                },
+                {
+                    "key": "teamSize",
+                    "type": "integer",
+                    "required": true,
+                    "array": false,
+                    "min": 1,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "solo_participants",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedTable": "63ea467225ce62402799",
+                    "relationType": "oneToMany",
+                    "twoWay": true,
+                    "twoWayKey": "teams",
+                    "onDelete": "cascade",
+                    "side": "parent"
+                },
+                {
+                    "key": "teams_participants",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedTable": "63ea4673919bf3a1ed85",
+                    "relationType": "oneToMany",
+                    "twoWay": true,
+                    "twoWayKey": "events",
+                    "onDelete": "cascade",
+                    "side": "parent"
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "63ea467225ce62402799",
+            "$permissions": [],
+            "databaseId": "attendexDb",
+            "name": "solo_participants",
+            "enabled": true,
+            "columns": [
+                {
+                    "key": "fullName",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "email",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "format": "email",
+                    "default": null
+                },
+                {
+                    "key": "isPresent",
+                    "type": "boolean",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "teams",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedTable": "63ea4671b6bb5d28fdd3",
+                    "relationType": "oneToMany",
+                    "twoWay": true,
+                    "twoWayKey": "solo_participants",
+                    "onDelete": "cascade",
+                    "side": "child"
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "63ea467298a33403f6f1",
+            "$permissions": [],
+            "databaseId": "attendexDb",
+            "name": "teams",
+            "enabled": true,
+            "columns": [
+                {
+                    "key": "teamName",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "teams_participants",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedTable": "63ea4673919bf3a1ed85",
+                    "relationType": "oneToMany",
+                    "twoWay": true,
+                    "twoWayKey": "teams",
+                    "onDelete": "cascade",
+                    "side": "parent"
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "63ea4673919bf3a1ed85",
+            "$permissions": [],
+            "databaseId": "attendexDb",
+            "name": "teams_participants",
+            "enabled": true,
+            "columns": [
+                {
+                    "key": "fullName",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "email",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "format": "email",
+                    "default": null
+                },
+                {
+                    "key": "isPresent",
+                    "type": "boolean",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "events",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedTable": "63ea4671b6bb5d28fdd3",
+                    "relationType": "oneToMany",
+                    "twoWay": true,
+                    "twoWayKey": "teams_participants",
+                    "onDelete": "cascade",
+                    "side": "child"
+                },
+                {
+                    "key": "teams",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedTable": "63ea467298a33403f6f1",
+                    "relationType": "oneToMany",
+                    "twoWay": true,
+                    "twoWayKey": "teams_participants",
+                    "onDelete": "cascade",
+                    "side": "child"
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "students",
+            "$permissions": [],
+            "databaseId": "attendexDb",
+            "name": "students",
+            "enabled": true,
+            "columns": [
+                {
+                    "key": "email",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "format": "email",
+                    "default": null
+                },
+                {
+                    "key": "fullName",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "isPresent",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": false
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "events",
+            "$permissions": [],
+            "databaseId": "attendexDb",
+            "name": "events",
+            "enabled": true,
+            "columns": [
+                {
+                    "key": "eventName",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "isOffline",
+                    "type": "boolean",
+                    "required": true,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "eventLocation",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "dateAndTime",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "label",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "elements": [
+                        "solo",
+                        "team"
+                    ],
+                    "format": "enum",
+                    "default": null
+                },
+                {
+                    "key": "teamSize",
+                    "type": "integer",
+                    "required": true,
+                    "array": false,
+                    "min": 1,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "solo_participants",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedTable": "solo_participants",
+                    "relationType": "oneToMany",
+                    "twoWay": true,
+                    "twoWayKey": "teams",
+                    "onDelete": "cascade",
+                    "side": "parent"
+                },
+                {
+                    "key": "teams_participants",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedTable": "teams_participants",
+                    "relationType": "oneToMany",
+                    "twoWay": true,
+                    "twoWayKey": "events",
+                    "onDelete": "cascade",
+                    "side": "parent"
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "solo_participants",
+            "$permissions": [],
+            "databaseId": "attendexDb",
+            "name": "solo_participants",
+            "enabled": true,
+            "columns": [
+                {
+                    "key": "fullName",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "email",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "format": "email",
+                    "default": null
+                },
+                {
+                    "key": "isPresent",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": false
+                },
+                {
+                    "key": "teams",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedTable": "events",
+                    "relationType": "oneToMany",
+                    "twoWay": true,
+                    "twoWayKey": "solo_participants",
+                    "onDelete": "cascade",
+                    "side": "child"
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "teams",
+            "$permissions": [],
+            "databaseId": "attendexDb",
+            "name": "teams",
+            "enabled": true,
+            "columns": [
+                {
+                    "key": "teamName",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "teams_participants",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedTable": "teams_participants",
+                    "relationType": "oneToMany",
+                    "twoWay": true,
+                    "twoWayKey": "teams",
+                    "onDelete": "cascade",
+                    "side": "parent"
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "teams_participants",
+            "$permissions": [],
+            "databaseId": "attendexDb",
+            "name": "teams_participants",
+            "enabled": true,
+            "columns": [
+                {
+                    "key": "fullName",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "email",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "format": "email",
+                    "default": null
+                },
+                {
+                    "key": "isPresent",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": false
+                },
+                {
+                    "key": "events",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedTable": "events",
+                    "relationType": "oneToMany",
+                    "twoWay": true,
+                    "twoWayKey": "teams_participants",
+                    "onDelete": "cascade",
+                    "side": "child"
+                },
+                {
+                    "key": "teams",
+                    "type": "relationship",
+                    "required": false,
+                    "array": false,
+                    "relatedTable": "teams",
+                    "relationType": "oneToMany",
+                    "twoWay": true,
+                    "twoWayKey": "teams_participants",
+                    "onDelete": "cascade",
+                    "side": "child"
+                }
+            ],
+            "indexes": []
+        }
+    ]
+}
