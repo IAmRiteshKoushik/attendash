@@ -4,36 +4,21 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type EventType int
-type EventLabel int
-
-const (
-	Online EventType = iota
-	Offline
-)
-
-const (
-	Workshop EventLabel = iota
-	Hackathon
-	Talks
-)
-
 type Event struct {
-	ID       int
-	Name     string
-	Date     string
-	Time     string
-	Location string
-	Type     EventType
-	Label    EventLabel
+	Id        string
+	Name      string
+	Location  string
+	IsOffline bool
+	Datetime  string
+	Label     string // "Solo" | "Team"
 }
 
-func (t EventType) String() string {
-	return [...]string{"Offline", "Online"}[t]
-}
-
-func (l EventLabel) String() string {
-	return [...]string{"Workshop", "Hackathon", "Talks"}[l]
+func (e *Event) CheckOffline() string {
+	if e.IsOffline == true {
+		return "Offline"
+	} else {
+		return "Online"
+	}
 }
 
 type EventCard struct {
@@ -48,14 +33,13 @@ var (
 			Margin(0, 0, 1, 0).
 			Width(60)
 
-	focusedCardStyle = cardStyle.Copy().
+	focusedCardStyle = cardStyle.
 				BorderForeground(lipgloss.Color("62")).
 				Bold(true)
 
-	labelColors = map[EventLabel]lipgloss.Color{
-		Workshop:  lipgloss.Color("196"),
-		Hackathon: lipgloss.Color("214"),
-		Talks:     lipgloss.Color("34"),
+	labelColors = map[string]lipgloss.Color{
+		"Solo": lipgloss.Color("196"),
+		"Team": lipgloss.Color("214"),
 	}
 )
 
@@ -74,10 +58,9 @@ func (c *EventCard) View() string {
 		Bold(true)
 
 	row1 := lipgloss.JoinHorizontal(lipgloss.Top,
-		lipgloss.NewStyle().Bold(true).Render(c.Event.Date),
-		lipgloss.NewStyle().MarginLeft(2).Render(c.Event.Time),
-		lipgloss.NewStyle().Faint(true).MarginLeft(4).Render(c.Event.Type.String()),
-		lipgloss.NewStyle().MarginLeft(4).Render(labelStyle.Render(c.Event.Label.String())),
+		lipgloss.NewStyle().Bold(true).Render(c.Event.Datetime),
+		lipgloss.NewStyle().Faint(true).MarginLeft(4).Render(c.Event.CheckOffline()),
+		lipgloss.NewStyle().MarginLeft(4).Render(labelStyle.Render(c.Event.Label)),
 	)
 	row2 := lipgloss.NewStyle().
 		Bold(true).

@@ -37,10 +37,12 @@ var (
 )
 
 type rootModel struct {
-	screenWidth   int
-	paneSelected  focusIndex
-	modelsMap     map[focusIndex]tea.Model
-	selectedEvent *components.Event
+	screenWidth       int
+	paneSelected      focusIndex
+	modelsMap         map[focusIndex]tea.Model
+	selectedEvent     *components.Event
+	showingFilePicker bool
+	filePicker        components.FilePickerModel
 }
 
 func (r *rootModel) Init() tea.Cmd { return nil }
@@ -52,12 +54,21 @@ func (r *rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		r.screenWidth = msg.Width
 		cmds = append(cmds, tea.ClearScreen)
+	case components.FileSelectedMsg:
+		r.showingFilePicker = false
+		fmt.Println("File picked:", msg.Path)
+		return r, nil
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "tab":
 			r.paneSelected = (r.paneSelected + 1) % 2
 		case "ctrl+c", "esc":
 			return r, tea.Quit
+
+		case "p":
+			r.showingFilePicker = true
+			r.filePicker = components.NewFilePickerModel()
+			return r, r.filePicker.Init()
 		}
 	case components.EventSelectedMsg:
 		r.selectedEvent = &msg.Event
@@ -67,6 +78,14 @@ func (r *rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			r.modelsMap[Preview] = pm
 			cmds = append(cmds, cmd)
 		}
+	}
+
+	if r.showingFilePicker {
+		model, cmd := r.filePicker.Update(msg)
+		if _, ok := model.(components.FilePickerModel); ok {
+			r.filePicker = model.(components.FilePickerModel)
+		}
+		return r, cmd
 	}
 
 	for k, m := range r.modelsMap {
@@ -80,6 +99,10 @@ func (r *rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (r *rootModel) View() string {
+	if r.showingFilePicker {
+		return r.filePicker.View()
+	}
+
 	windowSize := r.screenWidth / 2
 
 	leftView := r.modelsMap[Main].View()
@@ -95,7 +118,7 @@ func (r *rootModel) View() string {
 }
 
 func renderPane(title, content string, width int, active bool) string {
-	style := paneBaseStyle.Copy().Width(width)
+	style := paneBaseStyle.Width(width)
 
 	if active {
 		style = style.BorderForeground(borderColorActive)
@@ -109,17 +132,22 @@ func renderPane(title, content string, width int, active bool) string {
 	return style.Render(lipgloss.JoinVertical(lipgloss.Left, header, body))
 }
 
+// test data for now
+type simpleModel struct {
+	title string
+}
+
 type previewModel struct {
 	event        *components.Event
-	participants map[int][]string
+	participants map[string][]string
 }
 
 func NewPreviewModel() tea.Model {
 	return &previewModel{
-		participants: map[int][]string{
-			1: {"Alice", "Bob", "Charlie"},
-			2: {"Diana", "Ethan"},
-			3: {"Frank", "Grace", "Hannah", "Ivan"},
+		participants: map[string][]string{
+			"1": {"Alice", "Bob", "Charlie"},
+			"2": {"Diana", "Ethan"},
+			"3": {"Frank", "Grace", "Hannah", "Ivan"},
 		},
 	}
 }
@@ -138,19 +166,45 @@ func (p *previewModel) View() string {
 	if p.event == nil {
 		return "Right Pane (Placeholder)\n\n(Select an event to see participants here)"
 	}
-	list := p.participants[p.event.ID]
+	list := p.participants[p.event.Id]
 	if len(list) == 0 {
 		return fmt.Sprintf("Participants for %s\n\n(No participants yet)", p.event.Name)
 	}
 	rows := strings.Join(list, "\n- ")
 	return fmt.Sprintf("Participants for %s\n\n- %s", p.event.Name, rows)
 }
+
+func (s *simpleModel) View() string {
+	return fmt.Sprintf("\n  %s\n\n  (Press TAB to switch panes, ESC/Ctrl+C to quit, p for file picker)", s.title)
+}
+
 func DashboardInit() error {
 
 	events := []components.Event{
-		{ID: 1, Name: "GoConf", Date: "12 Sep", Time: "10:00 AM", Location: "Hall A", Type: components.Online, Label: components.Workshop},
-		{ID: 2, Name: "Workshop 101", Date: "12 Sep", Time: "11:30 AM", Location: "Hall B", Type: components.Offline, Label: components.Talks},
-		{ID: 3, Name: "Tech Meetup", Date: "13 Sep", Time: "2:00 PM", Location: "Lounge", Type: components.Offline, Label: components.Hackathon},
+		{
+			Id:        "1",
+			Name:      "GoConf",
+			Datetime:  "12 Sep 10:00 AM",
+			Location:  "Hall A",
+			IsOffline: true,
+			Label:     "Solo",
+		},
+		{
+			Id:        "2",
+			Name:      "Workshop 101",
+			Datetime:  "12 Sep 11:30AM",
+			Location:  "Hall B",
+			IsOffline: true,
+			Label:     "Solo",
+		},
+		{
+			Id:        "3",
+			Name:      "Tech Meetup",
+			Datetime:  "13 Sep 2:00 PM",
+			Location:  "Lounge",
+			IsOffline: true,
+			Label:     "Team",
+		},
 	}
 
 	modelsMap := map[focusIndex]tea.Model{

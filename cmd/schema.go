@@ -177,16 +177,6 @@ func setupStudentsTable() error {
 		return err
 	}
 
-	if _, err := Orm.CreateBooleanColumn(
-		dbName,
-		StudentsTable.Id,
-		"isPresent",
-		true,
-		Orm.WithCreateBooleanColumnArray(false),
-	); err != nil {
-		return err
-	}
-
 	return nil
 }
 
