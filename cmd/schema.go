@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/IAmRiteshKoushik/attendash/utils"
-	"github.com/appwrite/sdk-for-go/id"
 	"github.com/appwrite/sdk-for-go/models"
 	"github.com/appwrite/sdk-for-go/tablesdb"
 	"github.com/charmbracelet/log"
@@ -61,7 +60,7 @@ func schemaFunc(cmd *cobra.Command, args []string) error {
 		log.Error("Failed to setup `students` table", err)
 		return err
 	}
-	log.Info("Created `students` table")
+	log.Info("Created `students` table successfully")
 
 	if err := setupEventsTable(); err != nil {
 		log.Error("Failed to setup `events` table", err)
@@ -108,7 +107,7 @@ func initDatabase() error {
 
 	StudentsTable, err = Orm.CreateTable(
 		dbName,
-		id.Unique(),
+		studentsTable, // use the same thing for id
 		studentsTable,
 	)
 	if err != nil {
@@ -117,7 +116,7 @@ func initDatabase() error {
 
 	EventsTable, err = Orm.CreateTable(
 		dbName,
-		id.Unique(),
+		eventsTable,
 		eventsTable,
 	)
 	if err != nil {
@@ -126,7 +125,7 @@ func initDatabase() error {
 
 	SoloAttendanceTable, err = Orm.CreateTable(
 		dbName,
-		id.Unique(),
+		soloAttendanceTable,
 		soloAttendanceTable,
 	)
 	if err != nil {
@@ -135,7 +134,7 @@ func initDatabase() error {
 
 	EventTeamsTable, err = Orm.CreateTable(
 		dbName,
-		id.Unique(),
+		eventTeamsTable,
 		eventTeamsTable,
 	)
 	if err != nil {
@@ -144,7 +143,7 @@ func initDatabase() error {
 
 	TeamsAttendanceTable, err = Orm.CreateTable(
 		dbName,
-		id.Unique(),
+		teamsAttendanceTable,
 		teamsAttendanceTable,
 	)
 	if err != nil {
@@ -181,7 +180,8 @@ func setupStudentsTable() error {
 		dbName,
 		StudentsTable.Id,
 		"isPresent",
-		true,
+		false,
+		Orm.WithCreateBooleanColumnDefault(false),
 		Orm.WithCreateBooleanColumnArray(false),
 	); err != nil {
 		return err
@@ -276,7 +276,8 @@ func setupSoloAttendanceTable() error {
 		dbName,
 		SoloAttendanceTable.Id,
 		"isPresent",
-		true,
+		false,
+		Orm.WithCreateBooleanColumnDefault(false),
 		Orm.WithCreateBooleanColumnArray(false),
 	); err != nil {
 		return err
@@ -339,7 +340,8 @@ func setupTeamAttendanceTable() error {
 		dbName,
 		TeamsAttendanceTable.Id,
 		"isPresent",
-		true,
+		false,
+		Orm.WithCreateBooleanColumnDefault(false),
 		Orm.WithCreateBooleanColumnArray(false),
 	); err != nil {
 		return err
