@@ -5,6 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/IAmRiteshKoushik/attendash/ui/components"
 )
 
 type focusIndex uint
@@ -103,7 +104,7 @@ func (s *simpleModel) View() string {
 func DashboardInit() error {
 	modelsMap := map[focusIndex]tea.Model{
 		Main:    NewMainModel(),
-		Preview: NewPreviewModel(),
+		Preview:  components.ParticipantsTable(),
 	}
 
 	root := &rootModel{
