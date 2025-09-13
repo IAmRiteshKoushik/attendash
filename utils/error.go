@@ -1,8 +1,12 @@
 package utils
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"errors"
 
-func ErrorString(msg string) string {
+	"github.com/charmbracelet/lipgloss"
+)
+
+func ErrorString(msg string) error {
 	redStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
-	return redStyle.Render(msg)
+	return errors.New(redStyle.Render(msg))
 }

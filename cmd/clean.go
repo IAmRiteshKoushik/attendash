@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 )
 
@@ -22,5 +23,10 @@ func init() {
 }
 
 func cleanFunc(cmd *cobra.Command, args []string) error {
+	if _, err := Orm.Delete(dbName); err != nil {
+		return err
+	}
+
+	log.Info("DB removed")
 	return nil
 }

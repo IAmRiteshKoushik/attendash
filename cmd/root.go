@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 
-	// "github.com/IAmRiteshKoushik/attendash/ui"
 	"github.com/IAmRiteshKoushik/attendash/ui"
 	"github.com/IAmRiteshKoushik/attendash/utils"
 	"github.com/appwrite/sdk-for-go/appwrite"
@@ -54,15 +54,15 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig, initClient, initDatabase, loadLicense)
+	cobra.OnInitialize(initConfig, initClient, loadLicense)
 }
 
-func ValidateEnv(cfg *Config) error {
+func validateEnv(cfg *Config) error {
 	return validation.ValidateStruct(cfg,
 		validation.Field(&cfg.EndpointUrl, validation.Required, is.URL),
 		validation.Field(&cfg.ProjectKey, validation.Required),
 		validation.Field(&cfg.ApiKey, validation.Required),
-		validation.Field(&cfg.Mode, validation.Required, validation.In("dev", "prod")),
+		validation.Field(&cfg.Mode, validation.Required, validation.In("DEV", "PROD")),
 	)
 }
 
@@ -73,22 +73,22 @@ func initConfig() {
 	v.SetConfigType("toml")
 
 	if err := v.ReadInConfig(); err != nil {
-		panic(utils.ErrorString("Failed to read config from ENVIRONMENT"))
-	}
-	if err := v.Unmarshal(&cfg); err != nil {
-		panic(utils.ErrorString("Failed to serialize config from ENVIRONMENT"))
+		panic(utils.ErrorString(fmt.Sprintf("Failed to read config: %v", err)))
 	}
 
-	if err := ValidateEnv(cfg); err != nil {
-		panic(utils.ErrorString("Invalid configuration"))
+	if err := v.Unmarshal(&cfg); err != nil {
+		panic(utils.ErrorString(fmt.Sprintf("Failed to serialize config: %v", err)))
+	}
+
+	if err := validateEnv(cfg); err != nil {
+		panic(utils.ErrorString(fmt.Sprintf("Invalid configuration: %v", err)))
 	}
 }
 
 func loadLicense() {
 	cwd, err := os.Getwd()
 	if err != nil {
-		log.Printf("Could not get working directory: %v", err)
-		return
+		log.Fatal(utils.ErrorString(fmt.Sprintf("Could not get working directory: %v", err)))
 	}
 	licensePath := filepath.Join(cwd, "LICENSE")
 	content, err := os.ReadFile(licensePath)
@@ -100,17 +100,19 @@ func loadLicense() {
 		}
 	}
 	if err != nil {
-		log.Printf("LICENSE file not found or failed to read: %v", err)
-		return
+		log.Fatal(utils.ErrorString(fmt.Sprintf("LICENSE file not found or failed to read: %v", err)))
 	}
 
 	userLicense = string(content)
 }
 
 func initClient() {
+
 	appwriteClient = client.New(
 		appwrite.WithProject(cfg.ProjectKey),
 		appwrite.WithKey(cfg.ApiKey),
 		appwrite.WithEndpoint(cfg.EndpointUrl),
 	)
+
+	Orm = appwrite.NewTablesDB(appwriteClient)
 }
