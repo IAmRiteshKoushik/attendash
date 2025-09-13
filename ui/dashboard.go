@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 
+	"github.com/IAmRiteshKoushik/attendash/ui/components"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -28,6 +29,9 @@ type rootModel struct {
 	screenWidth  int
 	paneSelected focusIndex
 	modelsMap    map[focusIndex]tea.Model
+
+	showingFilePicker bool
+	filePicker        components.FilePickerModel
 }
 
 func (r *rootModel) Init() tea.Cmd { return nil }
@@ -39,13 +43,30 @@ func (r *rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		r.screenWidth = msg.Width
 		cmds = append(cmds, tea.ClearScreen)
+	case components.FileSelectedMsg:
+		r.showingFilePicker = false
+		fmt.Println("File picked:", msg.Path)
+		return r, nil
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "tab":
 			r.paneSelected = (r.paneSelected + 1) % 2
 		case "ctrl+c", "esc":
 			return r, tea.Quit
+
+		case "p":
+			r.showingFilePicker = true
+			r.filePicker = components.NewFilePickerModel()
+			return r, r.filePicker.Init()
 		}
+	}
+
+	if r.showingFilePicker {
+		model, cmd := r.filePicker.Update(msg)
+		if _, ok := model.(components.FilePickerModel); ok {
+			r.filePicker = model.(components.FilePickerModel)
+		}
+		return r, cmd
 	}
 
 	for k, m := range r.modelsMap {
@@ -59,6 +80,10 @@ func (r *rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (r *rootModel) View() string {
+	if r.showingFilePicker {
+		return r.filePicker.View()
+	}
+
 	windowSize := r.screenWidth / 2
 
 	leftView := r.modelsMap[Main].View()
@@ -77,7 +102,8 @@ func (r *rootModel) View() string {
 
 	return lipgloss.JoinHorizontal(lipgloss.Left, leftView, rightView)
 }
-//test data for now
+
+// test data for now
 type simpleModel struct {
 	title string
 }
@@ -97,7 +123,7 @@ func (s *simpleModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (s *simpleModel) View() string {
-	return fmt.Sprintf("\n  %s\n\n  (Press TAB to switch panes, ESC/Ctrl+C to quit)", s.title)
+	return fmt.Sprintf("\n  %s\n\n  (Press TAB to switch panes, ESC/Ctrl+C to quit, p for file picker)", s.title)
 }
 
 func DashboardInit() error {
