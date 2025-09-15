@@ -1,40 +1,41 @@
 package api
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Event struct {
-	Name     string `json:"name"`
-	Location string `json:"location"`
+	Id        string
+	Name      string
+	Location  string
+	IsOffline bool
+	Datetime  string
+	Label     string // "Solo" | "Team"
 }
 
-type EventWithID struct {
-	ID string `json:"id"`
-	Event
+func (e Event) Title() string {
+	return e.Name
 }
 
-type Participant struct {
-	Name string
-	Roll string
+func (e Event) Description() string {
+	var sb strings.Builder
+
+	// row1: Add DateTime && Online | Offline
+	sb.WriteString(fmt.Sprintf("%s | ", e.Datetime))
+	if e.IsOffline {
+		sb.WriteString("Offline\n")
+	} else {
+		sb.WriteString("Online\n")
+	}
+
+	// row3: Solo | Team && Location
+	sb.WriteString(fmt.Sprintf("%s | ", e.Label))
+	sb.WriteString(fmt.Sprintf("%s\n", e.Location))
+
+	return sb.String()
 }
 
-type ParticipantWithID struct {
-	ID string `json:"id"`
-	Participant
-}
-
-func FetchAllEvents() []EventWithID {
-	return nil
-}
-
-func (e *Event) FetchEventParticipants() []ParticipantWithID {
-	return nil
-}
-
-func (e *Event) CreateEvent() EventWithID {
-	return EventWithID{}
-}
-
-func (e *Event) EditEvent() EventWithID {
-	return EventWithID{}
-}
-
-func (e *EventWithID) PopulateEvent(p []Participant) {
+func (e Event) FilterValue() string {
+	return e.Name
 }
