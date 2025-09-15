@@ -12,12 +12,21 @@ type Event struct {
 	IsOffline bool
 	Datetime  string
 	Label     string // "Solo" | "Team"
+
+	// Datetime is deserialized into this for simpler handling
+	Day    string
+	Month  string
+	Year   string
+	Hour   string
+	Minute string
 }
 
+// The Title() method is used by the sidebar component to render the title
 func (e Event) Title() string {
 	return e.Name
 }
 
+// The description method is used by the sidebar to render the description
 func (e Event) Description() string {
 	var sb strings.Builder
 
@@ -36,6 +45,20 @@ func (e Event) Description() string {
 	return sb.String()
 }
 
+// The filter value method is used by the sidebar to fuzzy find events
 func (e Event) FilterValue() string {
 	return e.Name
+}
+
+// The following methods involve invoking the AppWrite SDK for pushing into DB
+func (e *Event) New() (*Event, error) {
+	return e, nil
+}
+
+func (e *Event) Edit() (*Event, error) {
+	return e, nil
+}
+
+func (e *Event) Delete() error {
+	return nil
 }

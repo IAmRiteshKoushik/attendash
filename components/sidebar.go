@@ -104,7 +104,7 @@ var events = []list.Item{
 	},
 }
 
-var sidebarStyle = lipgloss.NewStyle().Margin(1, 0).
+var SidebarStyle = lipgloss.NewStyle().Margin(1, 0).
 	BorderStyle(lipgloss.NormalBorder()).
 	BorderForeground(lipgloss.Color("63")).
 	BorderTop(false).

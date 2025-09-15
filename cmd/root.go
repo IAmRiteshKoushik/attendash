@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/IAmRiteshKoushik/attendash/ui"
+	"github.com/IAmRiteshKoushik/attendash/pages"
 	"github.com/IAmRiteshKoushik/attendash/utils"
 	"github.com/appwrite/sdk-for-go/appwrite"
 	"github.com/appwrite/sdk-for-go/client"
@@ -42,7 +42,7 @@ var rootCmd = &cobra.Command{
 tracker data. It provides a streamlined TUI to view, edit, and analyze attendance 
 records for ACM events.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return ui.DashboardInit()
+		return pages.DashboardInit()
 	},
 }
 
@@ -58,11 +58,16 @@ func init() {
 }
 
 func validateEnv(cfg *Config) error {
-	return validation.ValidateStruct(cfg,
+	return validation.ValidateStruct(
+		cfg,
 		validation.Field(&cfg.EndpointUrl, validation.Required, is.URL),
 		validation.Field(&cfg.ProjectKey, validation.Required),
 		validation.Field(&cfg.ApiKey, validation.Required),
-		validation.Field(&cfg.Mode, validation.Required, validation.In("DEV", "PROD")),
+		validation.Field(
+			&cfg.Mode,
+			validation.Required,
+			validation.In("DEV", "PROD"),
+		),
 	)
 }
 
@@ -77,7 +82,11 @@ func initConfig() {
 	}
 
 	if err := v.Unmarshal(&cfg); err != nil {
-		panic(utils.ErrorString(fmt.Sprintf("Failed to serialize config: %v", err)))
+		panic(
+			utils.ErrorString(
+				fmt.Sprintf("Failed to serialize config: %v", err),
+			),
+		)
 	}
 
 	if err := validateEnv(cfg); err != nil {
@@ -88,7 +97,11 @@ func initConfig() {
 func loadLicense() {
 	cwd, err := os.Getwd()
 	if err != nil {
-		log.Fatal(utils.ErrorString(fmt.Sprintf("Could not get working directory: %v", err)))
+		log.Fatal(
+			utils.ErrorString(
+				fmt.Sprintf("Could not get working directory: %v", err),
+			),
+		)
 	}
 	licensePath := filepath.Join(cwd, "LICENSE")
 	content, err := os.ReadFile(licensePath)
@@ -100,14 +113,20 @@ func loadLicense() {
 		}
 	}
 	if err != nil {
-		log.Fatal(utils.ErrorString(fmt.Sprintf("LICENSE file not found or failed to read: %v", err)))
+		log.Fatal(
+			utils.ErrorString(
+				fmt.Sprintf(
+					"LICENSE file not found or failed to read: %v",
+					err,
+				),
+			),
+		)
 	}
 
 	userLicense = string(content)
 }
 
 func initClient() {
-
 	appwriteClient = client.New(
 		appwrite.WithProject(cfg.ProjectKey),
 		appwrite.WithKey(cfg.ApiKey),
