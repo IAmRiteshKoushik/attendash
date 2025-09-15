@@ -96,7 +96,6 @@ func schemaFunc(cmd *cobra.Command, args []string) error {
 }
 
 func initDatabase() error {
-
 	_, err := Orm.Create(
 		dbName,
 		dbName,
@@ -172,17 +171,6 @@ func setupStudentsTable() error {
 		true,
 		Orm.WithCreateStringColumnEncrypt(false),
 		Orm.WithCreateStringColumnArray(false),
-	); err != nil {
-		return err
-	}
-
-	if _, err := Orm.CreateBooleanColumn(
-		dbName,
-		StudentsTable.Id,
-		"isPresent",
-		false,
-		Orm.WithCreateBooleanColumnDefault(false),
-		Orm.WithCreateBooleanColumnArray(false),
 	); err != nil {
 		return err
 	}

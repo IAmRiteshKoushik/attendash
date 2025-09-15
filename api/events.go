@@ -1,40 +1,64 @@
 package api
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Event struct {
-	Name     string `json:"name"`
-	Location string `json:"location"`
+	Id        string
+	Name      string
+	Location  string
+	IsOffline bool
+	Datetime  string
+	Label     string // "Solo" | "Team"
+
+	// Datetime is deserialized into this for simpler handling
+	Day    string
+	Month  string
+	Year   string
+	Hour   string
+	Minute string
 }
 
-type EventWithID struct {
-	ID string `json:"id"`
-	Event
+// The Title() method is used by the sidebar component to render the title
+func (e Event) Title() string {
+	return e.Name
 }
 
-type Participant struct {
-	Name string
-	Roll string
+// The description method is used by the sidebar to render the description
+func (e Event) Description() string {
+	var sb strings.Builder
+
+	// row1: Add DateTime && Online | Offline
+	sb.WriteString(fmt.Sprintf("%s | ", e.Datetime))
+	if e.IsOffline {
+		sb.WriteString("Offline\n")
+	} else {
+		sb.WriteString("Online\n")
+	}
+
+	// row3: Solo | Team && Location
+	sb.WriteString(fmt.Sprintf("%s | ", e.Label))
+	sb.WriteString(fmt.Sprintf("%s\n", e.Location))
+
+	return sb.String()
 }
 
-type ParticipantWithID struct {
-	ID string `json:"id"`
-	Participant
+// The filter value method is used by the sidebar to fuzzy find events
+func (e Event) FilterValue() string {
+	return e.Name
 }
 
-func FetchAllEvents() []EventWithID {
+// The following methods involve invoking the AppWrite SDK for pushing into DB
+func (e *Event) New() (*Event, error) {
+	return e, nil
+}
+
+func (e *Event) Edit() (*Event, error) {
+	return e, nil
+}
+
+func (e *Event) Delete() error {
 	return nil
-}
-
-func (e *Event) FetchEventParticipants() []ParticipantWithID {
-	return nil
-}
-
-func (e *Event) CreateEvent() EventWithID {
-	return EventWithID{}
-}
-
-func (e *Event) EditEvent() EventWithID {
-	return EventWithID{}
-}
-
-func (e *EventWithID) PopulateEvent(p []Participant) {
 }
