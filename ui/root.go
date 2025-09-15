@@ -1,8 +1,10 @@
 package ui
 
 import (
+	"github.com/IAmRiteshKoushik/attendash/api"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/huh"
 )
 
 const (
@@ -11,9 +13,15 @@ const (
 )
 
 type root struct {
-	pane      int
-	sidebar   list.Model
-	workspace tea.Model
+	showEventForm        bool
+	showParticipantForm  bool
+	pane                 int
+	sidebar              list.Model
+	workspace            tea.Model
+	eventForm            *huh.Form
+	eventFormState       api.Event
+	participantForm      *huh.Form
+	participantFormState api.Participant
 }
 
 func (r root) Init() tea.Cmd {
