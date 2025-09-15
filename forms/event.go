@@ -1,6 +1,11 @@
 package forms
 
 import (
+	"errors"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/IAmRiteshKoushik/attendash/api"
 	"github.com/charmbracelet/huh"
 )
@@ -11,10 +16,7 @@ func NewEventForm(e api.Event) *huh.Form {
 			// Event Name
 			huh.NewInput().Title("Event Name").
 				Placeholder("ACM Winter of Code").
-				Value(&e.Name).
-				Validate(func(s string) error {
-					return nil
-				}),
+				Value(&e.Name),
 			// Event Location
 			huh.NewInput().Title("Event Location").
 				Value(&e.Location).
@@ -25,30 +27,35 @@ func NewEventForm(e api.Event) *huh.Form {
 					huh.NewOption("Offline", true).Selected(e.IsOffline),
 					huh.NewOption("Online", false).Selected(!e.IsOffline)).
 				Value(&e.IsOffline),
-		).WithShowErrors(true),
+		),
 
 		huh.NewGroup(
 			// Event date
-			huh.NewInput().Title("Event date").Value(&e.Day).Placeholder("DD"),
+			huh.NewInput().
+				Title("Event date").
+				Value(&e.Day).
+				Placeholder("DD").
+				Validate(validateDay),
 			huh.NewInput().
 				Title("Event month").
 				Value(&e.Month).
-				Placeholder("MM"),
+				Placeholder("MM").
+				Validate(validateMonth),
 			huh.NewInput().
 				Title("Event year").
 				Value(&e.Year).
-				Placeholder("YYYY"),
-		).WithShowErrors(true),
+				Placeholder("YYYY").Validate(validateYear),
+		),
 		huh.NewGroup(
 			// Event time
 			huh.NewInput().
 				Title("Hours (24h)").
 				Value(&e.Hour).
-				Placeholder("HH"),
+				Placeholder("HH").Validate(validateHour),
 			huh.NewInput().
 				Title("Minutes").
 				Value(&e.Minute).
-				Placeholder("MM"),
+				Placeholder("MM").Validate(validateMinute),
 		),
 		huh.NewGroup(
 			// Event Label
@@ -63,6 +70,87 @@ func NewEventForm(e api.Event) *huh.Form {
 				Affirmative("Yes").
 				Negative("No."),
 		),
-	).WithLayout(huh.LayoutGrid(2, 2)).WithWidth(75)
+	).WithLayout(huh.LayoutGrid(1, 4)).WithWidth(120).WithShowErrors(true)
+
 	return form
+}
+
+func validateDay(s string) error {
+	if s == "" || s != strings.TrimSpace(s) {
+		return errors.New("day is either empty or has leading/trailing spaces")
+	}
+	num, err := strconv.Atoi(s)
+	if err != nil {
+		return err
+	}
+	if num < 1 || num > 31 {
+		return errors.New("date must be between 1 to 31")
+	}
+
+	return nil
+}
+
+func validateMonth(s string) error {
+	if s == "" || s != strings.TrimSpace(s) {
+		return errors.New(
+			"month is either empty or has leading/trailing spaces",
+		)
+	}
+	num, err := strconv.Atoi(s)
+	if err != nil {
+		return err
+	}
+	if num < 1 || num > 12 {
+		return errors.New("month must be between 1 to 12")
+	}
+
+	return nil
+}
+
+func validateYear(s string) error {
+	if s == "" || s != strings.TrimSpace(s) {
+		return errors.New("year is either empty or has leading/trailing spaces")
+	}
+	num, err := strconv.Atoi(s)
+	if err != nil {
+		return err
+	}
+
+	if num < time.Now().Year() {
+		return errors.New("year must be greater or equal to current year")
+	}
+
+	return nil
+}
+
+func validateHour(s string) error {
+	if s == "" || s != strings.TrimSpace(s) {
+		return errors.New("hour is either empty or has leading/trailing spaces")
+	}
+	num, err := strconv.Atoi(s)
+	if err != nil {
+		return err
+	}
+	if num < 0 || num > 23 {
+		return errors.New("hour must be between 0 and 23")
+	}
+
+	return nil
+}
+
+func validateMinute(s string) error {
+	if s == "" || s != strings.TrimSpace(s) {
+		return errors.New(
+			"minutes is either empty or has leading/trailing spaces",
+		)
+	}
+	num, err := strconv.Atoi(s)
+	if err != nil {
+		return err
+	}
+	if num < 0 || num > 59 {
+		return errors.New("minutes must be between 0 to 59")
+	}
+
+	return nil
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/huh"
 )
 
+// TODO: Use it to edit participant details
 func NewParticipantForm(isTeam bool, p api.Participant) *huh.Form {
 	fields := []huh.Field{
 		huh.NewNote().
@@ -25,7 +26,7 @@ func NewParticipantForm(isTeam bool, p api.Participant) *huh.Form {
 			Title("Student email").
 			Placeholder("roll@cb.students.amrita.edu").
 			Validate(validateEmail).Value(&p.Email),
-		// Present validation
+		// Present
 		huh.NewSelect[bool]().Title("IsPresent").
 			Value(&p.IsPresent).
 			Options(
