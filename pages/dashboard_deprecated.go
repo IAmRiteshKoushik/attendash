@@ -1,10 +1,10 @@
-package ui
+package pages
 
 import (
 	"fmt"
 	"strings"
 
-	"github.com/IAmRiteshKoushik/attendash/ui/components"
+	"github.com/IAmRiteshKoushik/attendash/components"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -108,12 +108,24 @@ func (r *rootModel) View() string {
 	leftView := r.modelsMap[Main].View()
 	rightView := r.modelsMap[Preview].View()
 
-	leftPane := renderPane("Events", leftView, windowSize, r.paneSelected == Main)
-	rightPane := renderPane("Details", rightView, windowSize, r.paneSelected == Preview)
+	leftPane := renderPane(
+		"Events",
+		leftView,
+		windowSize,
+		r.paneSelected == Main,
+	)
+	rightPane := renderPane(
+		"Details",
+		rightView,
+		windowSize,
+		r.paneSelected == Preview,
+	)
 
 	ui := lipgloss.JoinHorizontal(lipgloss.Top, leftPane, rightPane)
 
-	footer := footerStyle.Render("↑/↓ to navigate • ENTER to select • TAB to switch panes • ESC to quit")
+	footer := footerStyle.Render(
+		"↑/↓ to navigate • ENTER to select • TAB to switch panes • ESC to quit",
+	)
 	return lipgloss.JoinVertical(lipgloss.Left, ui, footer)
 }
 
@@ -168,18 +180,23 @@ func (p *previewModel) View() string {
 	}
 	list := p.participants[p.event.Id]
 	if len(list) == 0 {
-		return fmt.Sprintf("Participants for %s\n\n(No participants yet)", p.event.Name)
+		return fmt.Sprintf(
+			"Participants for %s\n\n(No participants yet)",
+			p.event.Name,
+		)
 	}
 	rows := strings.Join(list, "\n- ")
 	return fmt.Sprintf("Participants for %s\n\n- %s", p.event.Name, rows)
 }
 
 func (s *simpleModel) View() string {
-	return fmt.Sprintf("\n  %s\n\n  (Press TAB to switch panes, ESC/Ctrl+C to quit, p for file picker)", s.title)
+	return fmt.Sprintf(
+		"\n  %s\n\n  (Press TAB to switch panes, ESC/Ctrl+C to quit, p for file picker)",
+		s.title,
+	)
 }
 
-func DashboardInit() error {
-
+func DbInit() error {
 	events := []components.Event{
 		{
 			Id:        "1",

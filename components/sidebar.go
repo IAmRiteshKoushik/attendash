@@ -1,4 +1,4 @@
-package ui
+package components
 
 import (
 	"github.com/IAmRiteshKoushik/attendash/api"
@@ -104,19 +104,16 @@ var events = []list.Item{
 	},
 }
 
-var (
-	sidebarStyle = lipgloss.NewStyle().Margin(1, 0).
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("63")).
-		BorderTop(false).
-		BorderLeft(false).
-		BorderBottom(false).
-		BorderRight(true).
-		Padding(0, 2, 0, 0)
-)
+var sidebarStyle = lipgloss.NewStyle().Margin(1, 0).
+	BorderStyle(lipgloss.NormalBorder()).
+	BorderForeground(lipgloss.Color("63")).
+	BorderTop(false).
+	BorderLeft(false).
+	BorderBottom(false).
+	BorderRight(true).
+	Padding(0, 2, 0, 0)
 
 func NewSidebar() list.Model {
-
 	defDelegate := list.NewDefaultDelegate()
 	defDelegate.SetHeight(3)
 

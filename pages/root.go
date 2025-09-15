@@ -1,4 +1,4 @@
-package ui
+package pages
 
 import (
 	"github.com/IAmRiteshKoushik/attendash/api"
@@ -49,7 +49,6 @@ func (r root) View() string {
 }
 
 func NewRoot() root {
-
 	r := root{
 		pane:      sidebarView,
 		sidebar:   NewSidebar(),
