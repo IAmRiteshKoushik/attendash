@@ -10,7 +10,7 @@ import (
 	"github.com/charmbracelet/huh"
 )
 
-func NewEventForm(e api.Event) *huh.Form {
+func NewEventForm(e *api.Event) *huh.Form {
 	form := huh.NewForm(
 		huh.NewGroup(
 			// Event Name
