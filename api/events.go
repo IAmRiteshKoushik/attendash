@@ -12,6 +12,7 @@ type Event struct {
 	IsOffline bool
 	Datetime  string
 	Label     string // "Solo" | "Team"
+	TeamSize  int
 
 	// Datetime is deserialized into this for simpler handling
 	Day    string

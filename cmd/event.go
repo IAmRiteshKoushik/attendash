@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/IAmRiteshKoushik/attendash/api"
 	"github.com/IAmRiteshKoushik/attendash/forms"
 	"github.com/appwrite/sdk-for-go/id"
@@ -29,9 +31,19 @@ func launchEventForm(cmd *cobra.Command, args []string) {
 	form := forms.NewEventForm(&newEvent)
 	if err := form.Run(); err != nil {
 		log.Error(err)
+		if err.Error() == "user aborted" {
+			return
+		}
 	}
 
-	dateTimeString := fmt.Sprintf("%s-%s-%sT%s:%s:00Z", newEvent.Year, newEvent.Month, newEvent.Day, newEvent.Hour, newEvent.Minute)
+	dateTimeString := fmt.Sprintf(
+		"%s-%s-%sT%s:%s:00Z",
+		newEvent.Year,
+		newEvent.Month,
+		newEvent.Day,
+		newEvent.Hour,
+		newEvent.Minute,
+	)
 
 	// This block is essential to prevent crashes and ensure correct format.
 	parsedTime, err := time.Parse("2006-01-02T15:04:05Z", dateTimeString)
@@ -41,6 +53,13 @@ func launchEventForm(cmd *cobra.Command, args []string) {
 		return
 	}
 	newEvent.Datetime = parsedTime.Format(time.RFC3339)
+	newEvent.Label = strings.ToLower(newEvent.Label)
+
+	if newEvent.Label == "solo" {
+		newEvent.TeamSize = 1
+	} else {
+		newEvent.TeamSize = 4
+	}
 
 	if _, err := CreateEvent(&newEvent); err != nil {
 		log.Error("Failed to create event in Appwrite", "err", err)
@@ -58,6 +77,7 @@ func CreateEvent(e *api.Event) (*models.Row, error) {
 		"eventLocation": e.Location,
 		"dateAndTime":   e.Datetime,
 		"label":         e.Label,
+		"teamSize":      e.TeamSize,
 	}
 
 	log.Infof("dbId: %s", dbName)
